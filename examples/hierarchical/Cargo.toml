@@ -1,0 +1,13 @@
+[package]
+name = "saddle-physics-destruction-example-hierarchical"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+bevy = { workspace = true }
+saddle-physics-destruction = { workspace = true }
+saddle-physics-destruction-example-support = { path = "../support" }
+
+[lints]
+workspace = true
