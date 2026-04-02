@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use saddle_physics_saddle_physics_destruction::{
+use saddle_physics_destruction::{
     ApplyDestructionDamage, Destructible, DestructionAssetHandle, DestructionDiagnostics,
     DestructionPlugin, DestructionState, DestructionViewers, FractureBias, FracturedAsset,
     Fragment, FragmentLifetime, FragmentRenderData, FragmentSpawnData, MaterialHint,

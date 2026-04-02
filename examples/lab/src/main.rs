@@ -2,7 +2,7 @@
 mod e2e;
 
 use bevy::prelude::*;
-use saddle_physics_saddle_physics_destruction::{
+use saddle_physics_destruction::{
     ChunkGroupDetached, CuboidAnchorPreset, CuboidFractureBuilder, Destructible,
     DestructionAssetHandle, DestructionConfig, DestructionDiagnostics, DestructionPlugin,
     DestructionState, DestructionSystems, DestructionViewers, FinalDestructionOccurred,
@@ -11,10 +11,10 @@ use saddle_physics_saddle_physics_destruction::{
     build_fragment_mesh,
 };
 
-#[cfg(feature = "dev")]
+#[cfg(all(feature = "dev", not(target_arch = "wasm32")))]
 use bevy_brp_extras::BrpExtrasPlugin;
 #[cfg(feature = "e2e")]
-use saddle_physics_saddle_physics_destruction::FractureBias;
+use saddle_physics_destruction::FractureBias;
 
 #[derive(Component)]
 struct LabCamera;
@@ -92,7 +92,7 @@ fn main() {
     .register_type::<LabMetrics>()
     .add_plugins(DestructionPlugin::default());
 
-    #[cfg(feature = "dev")]
+    #[cfg(all(feature = "dev", not(target_arch = "wasm32")))]
     app.add_plugins(BrpExtrasPlugin::default());
 
     #[cfg(feature = "e2e")]

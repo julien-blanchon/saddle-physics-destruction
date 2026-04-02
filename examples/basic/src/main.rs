@@ -1,7 +1,7 @@
 use saddle_physics_destruction_example_support as support;
 
 use bevy::prelude::*;
-use saddle_physics_saddle_physics_destruction::{
+use saddle_physics_destruction::{
     CuboidAnchorPreset, CuboidFractureBuilder, FractureBias, MaterialHint,
 };
 use support::{add_base_plugins, emit_damage, spawn_preview_root};
