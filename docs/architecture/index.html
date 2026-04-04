@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(() => {
+				document.documentElement.classList.add('js');
+				const storageKey = 'docs-theme';
+				const storedTheme = localStorage.getItem(storageKey);
+				const isDark =
+					storedTheme === 'dark' ||
+					(storedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.classList.toggle('dark', isDark);
+				document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+			})();
+		</script>
+		<link href="../../_app/immutable/entry/start.BdBwE6WG.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Cj6Xt-CK.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D6rU7RKI.js" rel="modulepreload">
+		<link href="../../_app/immutable/entry/app.DvD7n5OM.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D2PL5qU_.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DsnmJJEf.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/CGbRUU1n.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/0.D4uBrY2j.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Dd_LPaE9.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/PVFOXxND.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D3udy8KQ.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/2.CvEfPIvG.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DmOp8YSc.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/5.BOp3_yHr.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/O7QY0ZL7.js" rel="modulepreload">
+		<!--12qhfyh--><meta name="theme-color" content="#ffffff"/> <link rel="icon" type="image/svg+xml" href="../../favicon.svg"/> <meta name="description" content="Backend-agnostic destruction toolkit for breakable Bevy structures and pre-fractured assets"/><!----><!--1bpnej--><!--[0--><meta name="description" content="Architecture documentation"/><!--]--><!----><title>Architecture - saddle-physics-destruction</title>
+		<link href="../../_app/immutable/assets/manifest.DAGDUwuc.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/0.Cu___w4E.css" rel="stylesheet">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[0--><!--[--><!--[0--><!--[--><main class="relative h-dvh bg-background text-foreground"><div class="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-border bg-background px-4 py-1.5 lg:hidden"><a href="../../" class="inline-flex items-center gap-1 px-2 py-2 text-sm tracking-tight text-foreground"><span class="font-medium tracking-tight text-foreground">saddle-physics-destruction</span></a> <button class="-mr-2 inline-flex size-10 items-center justify-center gap-2 rounded-sm text-sm whitespace-nowrap text-foreground transition-colors duration-150 ease-out hover:bg-background-muted lg:hidden" aria-label="Toggle menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="20" height="20" aria-hidden="true"><!--[-1--><!--]--><path d="M4 6H28V8H4z"></path><path d="M4 24H28V26H4z"></path><path d="M4 12H28V14H4z"></path><path d="M4 18H28V20H4z"></path></svg><!----></button></div> <!--[-1--><!--]--><!----> <div class="flex h-full w-full min-w-0 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:pr-4 xl:grid-cols-[22rem_minmax(0,56rem)_18rem] xl:justify-center"><div class="hidden lg:block"><aside class="flex h-dvh flex-col bg-background" aria-label="Documentation sidebar"><div class="flex flex-col gap-4 p-4"><a href="../../" class="flex items-center gap-2"><span class="text-xl font-medium tracking-tight text-foreground">saddle-physics-destruction</span></a> <!--[0--><button type="button" class="group inset-shadow relative flex h-9 w-full items-center gap-2 rounded-sm bg-background-inset px-3 py-1.5 text-sm font-medium text-foreground-muted/70 transition-[color] duration-150 ease-out hover:text-foreground-muted"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="text-foreground-muted/70"><!--[-1--><!--]--><path d="M29,27.5859l-7.5521-7.5521a11.0177,11.0177,0,1,0-1.4141,1.4141L27.5859,29ZM4,13a9,9,0,1,1,9,9A9.01,9.01,0,0,1,4,13Z"></path></svg><!----> <span class="flex-1 text-left">Search...</span> <!--[0--><kbd class="card pointer-events-none relative hidden h-5 items-center gap-1 rounded-xs bg-background px-1.5 font-mono text-[10px] font-medium text-foreground-muted/70 select-none sm:flex">⌘ K</kbd><!--]--></button><!--]--><!----></div> <div class="relative flex flex-col overflow-hidden flex-1 svelte-1lcbi17"><div class="scrollbar-hide min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto p-4 svelte-1lcbi17" style="mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);"><nav class="flex flex-col space-y-1" aria-label="Documentation pages"><h4 class="mb-2 ml-2 text-xs font-medium tracking-wide text-foreground-muted/70 uppercase">Docs</h4> <!--[--><!--[-1--><a href="../../" class="block rounded-sm px-3 py-1.5 text-sm tracking-normal transition-all duration-150 ease-out text-foreground-muted hover:bg-background-muted hover:text-foreground">Overview</a><!--]--><!--[0--><button class="flex w-full items-center justify-between rounded-sm px-3 py-1.5 text-sm font-medium tracking-normal transition-all duration-150 ease-out hover:bg-background-muted hover:text-foreground text-foreground-muted"><span>Documentation</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 transition-transform duration-150"><!--[-1--><!--]--><path d="M22 16 12 26 10.6 24.6 19.2 16 10.6 7.4 12 6z"></path></svg><!----></button> <!--[-1--><!--]--><!--]--><!--[0--><button class="flex w-full items-center justify-between rounded-sm px-3 py-1.5 text-sm font-medium tracking-normal transition-all duration-150 ease-out hover:bg-background-muted hover:text-foreground text-foreground-muted"><span>Demos</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 transition-transform duration-150"><!--[-1--><!--]--><path d="M22 16 12 26 10.6 24.6 19.2 16 10.6 7.4 12 6z"></path></svg><!----></button> <!--[-1--><!--]--><!--]--><!--]--></nav><!----></div></div><!----> <div class="flex items-center gap-1 p-4"><!--[0--><button type="button" class="group transition-scale inset-shadow relative inline-flex size-7 items-center justify-center rounded-sm bg-background-inset text-foreground duration-150 ease-out active:scale-[0.95]" aria-label="Switch to dark mode"><span class="sr-only">Switch to dark mode</span> <span class="transition-transform duration-150 ease-out"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true"><!--[-1--><!--]--><path d="M16,12a4,4,0,1,1-4,4,4.0045,4.0045,0,0,1,4-4m0-2a6,6,0,1,0,6,6,6,6,0,0,0-6-6Z" transform="translate(0 .005)"></path><path d="M6.854 5.375H8.854V10.333H6.854z" transform="rotate(-45 7.86 7.856)"></path><path d="M2 15.005H7V17.005000000000003H2z"></path><path d="M5.375 23.147H10.333V25.147H5.375z" transform="rotate(-45 7.86 24.149)"></path><path d="M15 25.005H17V30.005H15z"></path><path d="M23.147 21.668H25.147V26.625999999999998H23.147z" transform="rotate(-45 24.152 24.149)"></path><path d="M25 15.005H30V17.005000000000003H25z"></path><path d="M21.668 6.854H26.625999999999998V8.854H21.668z" transform="rotate(-45 24.152 7.856)"></path><path d="M15 2.005H17V7.005H15z"></path></svg><!----></span> <span class="absolute transition-transform duration-150 ease-out scale-0 blur-[2px]"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true"><!--[-1--><!--]--><path d="M13.5025,5.4136A15.0755,15.0755,0,0,0,25.096,23.6082a11.1134,11.1134,0,0,1-7.9749,3.3893c-.1385,0-.2782.0051-.4178,0A11.0944,11.0944,0,0,1,13.5025,5.4136M14.98,3a1.0024,1.0024,0,0,0-.1746.0156A13.0959,13.0959,0,0,0,16.63,28.9973c.1641.006.3282,0,.4909,0a13.0724,13.0724,0,0,0,10.702-5.5556,1.0094,1.0094,0,0,0-.7833-1.5644A13.08,13.08,0,0,1,15.8892,4.38,1.0149,1.0149,0,0,0,14.98,3Z"></path></svg><!----></span></button><!--]--> <!--[0--><a class="group transition-scale inset-shadow relative inline-flex size-7 cursor-pointer items-center justify-center rounded-sm bg-background-inset text-foreground duration-150 ease-out active:scale-[0.95]" href="https://github.com/julien-blanchon/saddle-physics-destruction" target="_blank" rel="noreferrer" aria-label="Open project repository (opens in a new tab)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 flex-none"><!--[-1--><!--]--><path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"></path></svg><!----></a><!--]--></div></aside><!----></div> <div class="inset-shadow relative mx-auto h-full w-full max-w-4xl min-w-0 overflow-hidden border border-border bg-background-inset pt-12 lg:my-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-visible lg:rounded-xl lg:pt-0"><div class="relative flex flex-col overflow-hidden mx-auto h-full w-full lg:max-h-[calc(100dvh-2rem)] svelte-1lcbi17"><div id="docs-content-container" class="scrollbar-hide min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto rounded-lg overscroll-none flex flex-col gap-8 px-4 py-8 lg:px-8 svelte-1lcbi17" style="mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);"><section class="min-w-0 flex-1 space-y-8"><div class="space-y-4"><!--[-1--><!--]--> <h1 class="scroll-m-20 text-3xl font-medium tracking-tight text-foreground">Architecture</h1> <!--[0--><p class="max-w-4xl text-base font-normal tracking-normal text-foreground-muted">Architecture documentation</p><!--]--> <!--[0--><!--[0--><div class="relative z-20 mt-8 flex w-full gap-2 lg:hidden"><!--[0--><div class="inset-shadow w-full rounded-md bg-background-inset p-1.5"><button type="button" aria-live="polite" aria-disabled="false" class="card relative inline-flex h-9 w-full font-medium shrink-0 overflow-hidden items-center justify-center gap-2 rounded-sm bg-background px-4 py-2 text-sm whitespace-nowrap text-foreground transition-[background-color] duration-150 ease-out hover:bg-background-muted disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=size-])]:size-4 flex-1"><span class="grid place-items-center" style="grid-template-areas: 'content';"><!----><span class="flex items-center gap-2 font-medium tracking-normal text-foreground will-change-transform" style="grid-area: content;"><!--[-1--><svg role="img" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4 flex-none"><title>Markdown</title><path class="stroke-current" d="M1.212 5.5h21.576c.407 0 .712.317.712.679v11.549a.695.695 0 0 1-.712.677H1.212a.695.695 0 0 1-.712-.678V6.18c0-.362.305-.679.712-.679Z"></path><path class="fill-current" d="M3.03 15.96V7.946h2.425l2.424 2.946 2.424-2.946h2.424v8.014h-2.424v-4.596L7.88 14.31l-2.424-2.946v4.596H3.03Zm15.152 0-3.636-3.89h2.424V7.947h2.424v4.125h2.424l-3.636 3.889Z"></path></svg><!--]--> <span>Copy Markdown</span></span><!----></span></button></div><!--]--> <!--[0--><div class="inset-shadow relative rounded-md bg-background-inset p-1.5"><button id="mobile-doc-actions-menu-trigger" type="button" class="card relative inline-flex h-9 w-full font-medium shrink-0 overflow-hidden items-center justify-center gap-2 rounded-sm bg-background px-4 py-2 text-sm whitespace-nowrap text-foreground transition-[background-color] duration-150 ease-out hover:bg-background-muted disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=size-])]:size-4 flex-1 w-auto! px-2.5!" aria-label="More actions" aria-haspopup="menu" aria-controls="mobile-doc-actions-menu" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4"><!--[-1--><!--]--><circle cx="8" cy="16" r="2"></circle><circle cx="16" cy="16" r="2"></circle><circle cx="24" cy="16" r="2"></circle></svg><!----></button> <!--[-1--><!--]--></div><!--]--></div><!--]--><!--]--></div> <hr class="text-border"/> <div><!--[--><article data-doc-content="" class="w-full max-w-4xl"><!----><h2>Core Shape</h2>
+<p><code>saddle-physics-destruction</code> follows the same split that makes NVIDIA Blast useful as a reference:</p>
+<ul>
+<li>authored fracture data is separate from runtime state</li>
+<li>runtime breakage is separate from physics execution</li>
+<li>integration happens through messages and fragment descriptors, not hard-wired rigid bodies</li>
+</ul>
+<p>The crate&#39;s main data model is:</p>
+<div class="code-block" data-code="FracturedAsset
+  - chunks
+  - bonds
+  - root_chunks
+  - support_chunks
+
+Destructible entity
+  - DestructionAssetHandle
+  - DestructionRuntime (internal)
+  - DestructionState (public)" data-language="text">
+					<div class="shiki-theme-light"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span>FracturedAsset</span></span>
+<span class="line"><span>  - chunks</span></span>
+<span class="line"><span>  - bonds</span></span>
+<span class="line"><span>  - root_chunks</span></span>
+<span class="line"><span>  - support_chunks</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Destructible entity</span></span>
+<span class="line"><span>  - DestructionAssetHandle</span></span>
+<span class="line"><span>  - DestructionRuntime (internal)</span></span>
+<span class="line"><span>  - DestructionState (public)</span></span></code></pre></div>
+					<div class="shiki-theme-dark"><pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span>FracturedAsset</span></span>
+<span class="line"><span>  - chunks</span></span>
+<span class="line"><span>  - bonds</span></span>
+<span class="line"><span>  - root_chunks</span></span>
+<span class="line"><span>  - support_chunks</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Destructible entity</span></span>
+<span class="line"><span>  - DestructionAssetHandle</span></span>
+<span class="line"><span>  - DestructionRuntime (internal)</span></span>
+<span class="line"><span>  - DestructionState (public)</span></span></code></pre></div>
+				</div><h2>Authoring Model</h2>
+<p>Two authoring paths ship in v1:</p>
+<ol>
+<li><p><code>CuboidFractureBuilder</code></p>
+<ul>
+<li>deterministic jittered-grid volumetric fracture</li>
+<li>stable chunk IDs</li>
+<li>optional coarse parent groups</li>
+<li>anchor presets for top, bottom, or none</li>
+</ul>
+</li>
+<li><p><code>ThinSurfaceFractureBuilder</code></p>
+<ul>
+<li>deterministic 2D Voronoi-style cells extruded into depth</li>
+<li>suitable for glass, boards, panels, and thin walls</li>
+<li>frame/bottom-edge anchoring presets</li>
+</ul>
+</li>
+</ol>
+<p>Both builders emit a <code>FracturedAsset</code> that the runtime treats identically.</p>
+<p>For gameplay-driven content, a destructible may also carry <code>RuntimeFracture</code>. That component stores either builder variant directly on the entity. The plugin turns it into a <code>DestructionAssetHandle</code> during activation/update, so runtime-spawned props can fracture without a pre-authored asset handle.</p>
+<h2>Runtime Pipeline</h2>
+<p>The public system phases are exposed through <code>DestructionSystems</code>:</p>
+<ol>
+<li><code>AccumulateDamage</code></li>
+<li><code>EvaluateBonds</code></li>
+<li><code>EvaluateSupport</code></li>
+<li><code>ActivateFragments</code></li>
+<li><code>CleanupDebris</code></li>
+</ol>
+<p>Within those phases the default plugin executes:</p>
+<div class="code-block" data-code="ensure_runtime_initialized
+  -> process_damage_messages
+  -> evaluate_accumulated_damage
+  -> evaluate_support_graphs
+  -> activate_pending_groups
+  -> update_fragment_lifetimes
+  -> cleanup_fragments
+  -> sync_root_states
+  -> publish_diagnostics" data-language="text">
+					<div class="shiki-theme-light"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span>ensure_runtime_initialized</span></span>
+<span class="line"><span>  -> process_damage_messages</span></span>
+<span class="line"><span>  -> evaluate_accumulated_damage</span></span>
+<span class="line"><span>  -> evaluate_support_graphs</span></span>
+<span class="line"><span>  -> activate_pending_groups</span></span>
+<span class="line"><span>  -> update_fragment_lifetimes</span></span>
+<span class="line"><span>  -> cleanup_fragments</span></span>
+<span class="line"><span>  -> sync_root_states</span></span>
+<span class="line"><span>  -> publish_diagnostics</span></span></code></pre></div>
+					<div class="shiki-theme-dark"><pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span>ensure_runtime_initialized</span></span>
+<span class="line"><span>  -> process_damage_messages</span></span>
+<span class="line"><span>  -> evaluate_accumulated_damage</span></span>
+<span class="line"><span>  -> evaluate_support_graphs</span></span>
+<span class="line"><span>  -> activate_pending_groups</span></span>
+<span class="line"><span>  -> update_fragment_lifetimes</span></span>
+<span class="line"><span>  -> cleanup_fragments</span></span>
+<span class="line"><span>  -> sync_root_states</span></span>
+<span class="line"><span>  -> publish_diagnostics</span></span></code></pre></div>
+				</div><h2>World Space vs Asset Space</h2>
+<p>Damage messages are intentionally authored in <strong>world space</strong> because they usually come from gameplay hits, raycasts, explosions, or collision callbacks.</p>
+<p>Chunk centroids and bond centers inside <code>FracturedAsset</code> are stored in <strong>asset-local space</strong>.</p>
+<p>That means the runtime must convert the incoming hit into the destructible&#39;s local space before evaluating chunk or bond damage. The crate does this through the entity&#39;s <code>GlobalTransform</code>:</p>
+<ul>
+<li>hit origin: <code>world -&gt; local point</code></li>
+<li>hit direction: <code>world -&gt; local vector</code></li>
+</ul>
+<p>Without that conversion, destructibles placed away from the world origin can appear unbreakable even though origin-based tests still pass.</p>
+<h2>Support Graph Evaluation</h2>
+<p>Each support leaf can be anchored in one of two ways:</p>
+<ul>
+<li>authored support on the asset (<code>SupportKind::Fixed</code>, <code>Hanging</code>, <code>Weak</code>)</li>
+<li>per-entity override via <code>SupportAnchors</code></li>
+</ul>
+<p>When bonds change, the runtime flood-fills from anchored support leaves to find reachable chunks. Any disconnected support leaves become unsupported islands and are queued for fragment activation.</p>
+<p>This keeps structural integrity cheap:</p>
+<ul>
+<li>no per-frame flood fill when topology is unchanged</li>
+<li>support recomputation only after bond or chunk detach state changes</li>
+</ul>
+<p>If an asset has no anchors at all, the runtime falls back to a floating-structure rule:</p>
+<ul>
+<li>connected support components are recomputed only when topology changes</li>
+<li>the largest remaining component stays attached to the root</li>
+<li>smaller disconnected components detach as fragment groups</li>
+</ul>
+<p>That keeps free-floating crates and props progressive instead of treating &quot;no anchors&quot; as &quot;everything should detach immediately&quot;.</p>
+<h2>Hierarchy And LOD</h2>
+<p>Chunks may form a simple parent/child hierarchy:</p>
+<ul>
+<li>support leaves represent fine fracture pieces</li>
+<li>non-support parents represent coarse activation groups</li>
+</ul>
+<p>Activation LOD is driven by <code>DestructionViewers</code> and <code>DistanceLodBand</code>:</p>
+<ul>
+<li><code>Full</code>: activate fine support leaves</li>
+<li><code>Clustered</code>: prefer fewer/larger authored groups when possible</li>
+<li><code>EventOnly</code>: emit detachment messages without spawning fragment entities</li>
+</ul>
+<p>This keeps the core backend-neutral while still supporting near/far authoring behavior.</p>
+<h2>Fragment Activation Contract</h2>
+<p>The crate spawns entities with:</p>
+<ul>
+<li><code>Fragment</code></li>
+<li><code>FragmentLifetime</code></li>
+<li><code>FragmentSpawnData</code></li>
+<li>inherited transform</li>
+</ul>
+<p><code>FragmentSpawnData</code> is the integration seam. It contains:</p>
+<ul>
+<li>render description</li>
+<li>optional collider source metadata</li>
+<li>initial linear/angular velocity hints</li>
+<li>chunk IDs represented by the fragment</li>
+<li>approximate size and material hint</li>
+</ul>
+<p>Examples use <code>build_fragment_mesh</code> plus <code>StandardMaterial</code> to visualize fragments, but downstream code may instead spawn Avian bodies, pooled debris, custom materials, particles, or audio emitters.</p>
+<p>Two optional integration helpers now sit on top of that seam:</p>
+<ul>
+<li><code>DestructionEffectHooks</code><ul>
+<li>opt-in per-root cue names for <code>started</code>, <code>detached</code>, and <code>final</code> stages</li>
+<li>converted by the runtime into <code>DestructionEffectTriggered</code> messages so sound or particle systems do not need to reinterpret structural events themselves</li>
+</ul>
+</li>
+<li><code>DestructionAvianFragments</code> (<code>avian3d</code> feature)<ul>
+<li>opt-in fragment-body adapter that reads <code>FragmentSpawnData</code></li>
+<li>inserts colliders, rigid-body components, mass, damping, friction, restitution, and initial velocities on newly spawned fragments</li>
+<li>keeps the core crate backend-neutral because the adapter is compiled only when the feature is enabled</li>
+</ul>
+</li>
+</ul>
+<p>When <code>max_chunk_spawns_per_frame</code> is lower than the requested fragment count, activation is queued across subsequent frames. Detachment messages still fire once per detached group, while the remaining fragment spawns drain from the backlog without being lost.</p>
+<h2>Cleanup</h2>
+<p>Cleanup combines three mechanisms:</p>
+<ol>
+<li>expiry through <code>FragmentLifetime</code></li>
+<li>distance trimming relative to the nearest viewer</li>
+<li>global budget trimming based on <code>CleanupPolicy</code></li>
+</ol>
+<p>Budget trimming happens on the already-surviving fragments, so consumers can keep debris pressure bounded without relying only on timeouts.</p>
+<h2>Diagnostics And Debugging</h2>
+<p>The crate publishes:</p>
+<ul>
+<li><code>DestructionState</code> on each destructible</li>
+<li><code>DestructionDiagnostics</code> as a global resource</li>
+<li>integration messages for start, detach, and final break</li>
+</ul>
+<p>Optional gizmo output is controlled by <code>DestructionDebugConfig</code>. The debug system only runs when Bevy&#39;s gizmo resources exist, so logic-only tests and minimal apps do not need the full render/debug stack.</p>
+<!----></article> <!----><!--]--><!----> <!--[-1--><!--]--><!----></div></section><!----></div></div><!----></div> <aside class="hidden xl:block xl:w-full xl:py-8 xl:pr-4 xl:pl-4" aria-label="Table of contents and document actions"><div class="sticky top-8 flex h-full max-h-[calc(100dvh-4rem)] min-h-0 flex-col"><!--[0--><div class="min-h-0 flex-1"><div class="contents"><!--[-1--><div class="hidden text-sm tracking-normal text-foreground-muted/70 lg:block">No headings</div><!--]--></div><!----></div><!--]--> <!--[0--><!--[0--><div class="mt-auto"><div class="flex flex-col gap-1 text-sm"><!--[0--><button type="button" aria-live="polite" aria-disabled="false" class="group/option flex items-center gap-2 overflow-hidden rounded-sm px-3 py-1.5 text-left font-medium tracking-normal text-foreground-muted transition-colors duration-150 ease-out hover:bg-background-muted hover:text-foreground"><span class="grid" style="grid-template-areas: 'content';"><!----><span class="flex items-center gap-2" style="grid-area: content;"><!--[-1--><svg role="img" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4 flex-none"><title>Markdown</title><path class="stroke-current" d="M1.212 5.5h21.576c.407 0 .712.317.712.679v11.549a.695.695 0 0 1-.712.677H1.212a.695.695 0 0 1-.712-.678V6.18c0-.362.305-.679.712-.679Z"></path><path class="fill-current" d="M3.03 15.96V7.946h2.425l2.424 2.946 2.424-2.946h2.424v8.014h-2.424v-4.596L7.88 14.31l-2.424-2.946v4.596H3.03Zm15.152 0-3.636-3.89h2.424V7.947h2.424v4.125h2.424l-3.636 3.889Z"></path></svg><!--]--> <span>Copy as Markdown</span></span><!----></span></button><!--]--> <!--[0--><a class="group/option flex items-center gap-2 rounded-sm px-3 py-1.5 text-left font-medium tracking-normal text-foreground-muted transition-colors duration-150 ease-out hover:bg-background-muted hover:text-foreground" href="https://github.com/julien-blanchon/saddle-physics-destruction/blob/main/docs//saddle-physics-destruction/docs/architecture.md" target="_blank" rel="noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 flex-none"><!--[-1--><!--]--><path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"></path></svg><!----> <span>Open in GitHub</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="ml-auto size-4 flex-none"><!--[-1--><!--]--><path d="M26,28H6a2.0027,2.0027,0,0,1-2-2V6A2.0027,2.0027,0,0,1,6,4H16V6H6V26H26V16h2V26A2.0027,2.0027,0,0,1,26,28Z"></path><path d="M20 2 20 4 26.586 4 18 12.586 19.414 14 28 5.414 28 12 30 12 30 2 20 2z"></path></svg><!----> <span class="sr-only">(opens in a new tab)</span></a><!--]--> <!--[-1--><!--]--> <!--[-1--><!--]--></div></div><!--]--><!--]--></div></aside></div></main><!--]--><!--]--><!----> <!--[0--><!--[-1--><!--]--><!--]--><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_1b5dzy1 = {
+						base: new URL("../..", location).pathname.slice(0, -1),
+						assets: "/saddle-physics-destruction"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../../_app/immutable/entry/start.BdBwE6WG.js"),
+						import("../../_app/immutable/entry/app.DvD7n5OM.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 5],
+							data: [null,null,{type:"data",data:{html:"\u003Ch2>Core Shape\u003C/h2>\n\u003Cp>\u003Ccode>saddle-physics-destruction\u003C/code> follows the same split that makes NVIDIA Blast useful as a reference:\u003C/p>\n\u003Cul>\n\u003Cli>authored fracture data is separate from runtime state\u003C/li>\n\u003Cli>runtime breakage is separate from physics execution\u003C/li>\n\u003Cli>integration happens through messages and fragment descriptors, not hard-wired rigid bodies\u003C/li>\n\u003C/ul>\n\u003Cp>The crate&#39;s main data model is:\u003C/p>\n\u003Cdiv class=\"code-block\" data-code=\"FracturedAsset\n  - chunks\n  - bonds\n  - root_chunks\n  - support_chunks\n\nDestructible entity\n  - DestructionAssetHandle\n  - DestructionRuntime (internal)\n  - DestructionState (public)\" data-language=\"text\">\n\t\t\t\t\t\u003Cdiv class=\"shiki-theme-light\">\u003Cpre class=\"shiki github-light\" style=\"background-color:#fff;color:#24292e\" tabindex=\"0\">\u003Ccode>\u003Cspan class=\"line\">\u003Cspan>FracturedAsset\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - chunks\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - bonds\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - root_chunks\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - support_chunks\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>Destructible entity\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - DestructionAssetHandle\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - DestructionRuntime (internal)\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - DestructionState (public)\u003C/span>\u003C/span>\u003C/code>\u003C/pre>\u003C/div>\n\t\t\t\t\t\u003Cdiv class=\"shiki-theme-dark\">\u003Cpre class=\"shiki github-dark\" style=\"background-color:#24292e;color:#e1e4e8\" tabindex=\"0\">\u003Ccode>\u003Cspan class=\"line\">\u003Cspan>FracturedAsset\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - chunks\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - bonds\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - root_chunks\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - support_chunks\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>Destructible entity\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - DestructionAssetHandle\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - DestructionRuntime (internal)\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  - DestructionState (public)\u003C/span>\u003C/span>\u003C/code>\u003C/pre>\u003C/div>\n\t\t\t\t\u003C/div>\u003Ch2>Authoring Model\u003C/h2>\n\u003Cp>Two authoring paths ship in v1:\u003C/p>\n\u003Col>\n\u003Cli>\u003Cp>\u003Ccode>CuboidFractureBuilder\u003C/code>\u003C/p>\n\u003Cul>\n\u003Cli>deterministic jittered-grid volumetric fracture\u003C/li>\n\u003Cli>stable chunk IDs\u003C/li>\n\u003Cli>optional coarse parent groups\u003C/li>\n\u003Cli>anchor presets for top, bottom, or none\u003C/li>\n\u003C/ul>\n\u003C/li>\n\u003Cli>\u003Cp>\u003Ccode>ThinSurfaceFractureBuilder\u003C/code>\u003C/p>\n\u003Cul>\n\u003Cli>deterministic 2D Voronoi-style cells extruded into depth\u003C/li>\n\u003Cli>suitable for glass, boards, panels, and thin walls\u003C/li>\n\u003Cli>frame/bottom-edge anchoring presets\u003C/li>\n\u003C/ul>\n\u003C/li>\n\u003C/ol>\n\u003Cp>Both builders emit a \u003Ccode>FracturedAsset\u003C/code> that the runtime treats identically.\u003C/p>\n\u003Cp>For gameplay-driven content, a destructible may also carry \u003Ccode>RuntimeFracture\u003C/code>. That component stores either builder variant directly on the entity. The plugin turns it into a \u003Ccode>DestructionAssetHandle\u003C/code> during activation/update, so runtime-spawned props can fracture without a pre-authored asset handle.\u003C/p>\n\u003Ch2>Runtime Pipeline\u003C/h2>\n\u003Cp>The public system phases are exposed through \u003Ccode>DestructionSystems\u003C/code>:\u003C/p>\n\u003Col>\n\u003Cli>\u003Ccode>AccumulateDamage\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>EvaluateBonds\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>EvaluateSupport\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>ActivateFragments\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>CleanupDebris\u003C/code>\u003C/li>\n\u003C/ol>\n\u003Cp>Within those phases the default plugin executes:\u003C/p>\n\u003Cdiv class=\"code-block\" data-code=\"ensure_runtime_initialized\n  -> process_damage_messages\n  -> evaluate_accumulated_damage\n  -> evaluate_support_graphs\n  -> activate_pending_groups\n  -> update_fragment_lifetimes\n  -> cleanup_fragments\n  -> sync_root_states\n  -> publish_diagnostics\" data-language=\"text\">\n\t\t\t\t\t\u003Cdiv class=\"shiki-theme-light\">\u003Cpre class=\"shiki github-light\" style=\"background-color:#fff;color:#24292e\" tabindex=\"0\">\u003Ccode>\u003Cspan class=\"line\">\u003Cspan>ensure_runtime_initialized\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> process_damage_messages\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> evaluate_accumulated_damage\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> evaluate_support_graphs\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> activate_pending_groups\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> update_fragment_lifetimes\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> cleanup_fragments\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> sync_root_states\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> publish_diagnostics\u003C/span>\u003C/span>\u003C/code>\u003C/pre>\u003C/div>\n\t\t\t\t\t\u003Cdiv class=\"shiki-theme-dark\">\u003Cpre class=\"shiki github-dark\" style=\"background-color:#24292e;color:#e1e4e8\" tabindex=\"0\">\u003Ccode>\u003Cspan class=\"line\">\u003Cspan>ensure_runtime_initialized\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> process_damage_messages\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> evaluate_accumulated_damage\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> evaluate_support_graphs\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> activate_pending_groups\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> update_fragment_lifetimes\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> cleanup_fragments\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> sync_root_states\u003C/span>\u003C/span>\n\u003Cspan class=\"line\">\u003Cspan>  -> publish_diagnostics\u003C/span>\u003C/span>\u003C/code>\u003C/pre>\u003C/div>\n\t\t\t\t\u003C/div>\u003Ch2>World Space vs Asset Space\u003C/h2>\n\u003Cp>Damage messages are intentionally authored in \u003Cstrong>world space\u003C/strong> because they usually come from gameplay hits, raycasts, explosions, or collision callbacks.\u003C/p>\n\u003Cp>Chunk centroids and bond centers inside \u003Ccode>FracturedAsset\u003C/code> are stored in \u003Cstrong>asset-local space\u003C/strong>.\u003C/p>\n\u003Cp>That means the runtime must convert the incoming hit into the destructible&#39;s local space before evaluating chunk or bond damage. The crate does this through the entity&#39;s \u003Ccode>GlobalTransform\u003C/code>:\u003C/p>\n\u003Cul>\n\u003Cli>hit origin: \u003Ccode>world -&gt; local point\u003C/code>\u003C/li>\n\u003Cli>hit direction: \u003Ccode>world -&gt; local vector\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>Without that conversion, destructibles placed away from the world origin can appear unbreakable even though origin-based tests still pass.\u003C/p>\n\u003Ch2>Support Graph Evaluation\u003C/h2>\n\u003Cp>Each support leaf can be anchored in one of two ways:\u003C/p>\n\u003Cul>\n\u003Cli>authored support on the asset (\u003Ccode>SupportKind::Fixed\u003C/code>, \u003Ccode>Hanging\u003C/code>, \u003Ccode>Weak\u003C/code>)\u003C/li>\n\u003Cli>per-entity override via \u003Ccode>SupportAnchors\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>When bonds change, the runtime flood-fills from anchored support leaves to find reachable chunks. Any disconnected support leaves become unsupported islands and are queued for fragment activation.\u003C/p>\n\u003Cp>This keeps structural integrity cheap:\u003C/p>\n\u003Cul>\n\u003Cli>no per-frame flood fill when topology is unchanged\u003C/li>\n\u003Cli>support recomputation only after bond or chunk detach state changes\u003C/li>\n\u003C/ul>\n\u003Cp>If an asset has no anchors at all, the runtime falls back to a floating-structure rule:\u003C/p>\n\u003Cul>\n\u003Cli>connected support components are recomputed only when topology changes\u003C/li>\n\u003Cli>the largest remaining component stays attached to the root\u003C/li>\n\u003Cli>smaller disconnected components detach as fragment groups\u003C/li>\n\u003C/ul>\n\u003Cp>That keeps free-floating crates and props progressive instead of treating &quot;no anchors&quot; as &quot;everything should detach immediately&quot;.\u003C/p>\n\u003Ch2>Hierarchy And LOD\u003C/h2>\n\u003Cp>Chunks may form a simple parent/child hierarchy:\u003C/p>\n\u003Cul>\n\u003Cli>support leaves represent fine fracture pieces\u003C/li>\n\u003Cli>non-support parents represent coarse activation groups\u003C/li>\n\u003C/ul>\n\u003Cp>Activation LOD is driven by \u003Ccode>DestructionViewers\u003C/code> and \u003Ccode>DistanceLodBand\u003C/code>:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>Full\u003C/code>: activate fine support leaves\u003C/li>\n\u003Cli>\u003Ccode>Clustered\u003C/code>: prefer fewer/larger authored groups when possible\u003C/li>\n\u003Cli>\u003Ccode>EventOnly\u003C/code>: emit detachment messages without spawning fragment entities\u003C/li>\n\u003C/ul>\n\u003Cp>This keeps the core backend-neutral while still supporting near/far authoring behavior.\u003C/p>\n\u003Ch2>Fragment Activation Contract\u003C/h2>\n\u003Cp>The crate spawns entities with:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>Fragment\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>FragmentLifetime\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>FragmentSpawnData\u003C/code>\u003C/li>\n\u003Cli>inherited transform\u003C/li>\n\u003C/ul>\n\u003Cp>\u003Ccode>FragmentSpawnData\u003C/code> is the integration seam. It contains:\u003C/p>\n\u003Cul>\n\u003Cli>render description\u003C/li>\n\u003Cli>optional collider source metadata\u003C/li>\n\u003Cli>initial linear/angular velocity hints\u003C/li>\n\u003Cli>chunk IDs represented by the fragment\u003C/li>\n\u003Cli>approximate size and material hint\u003C/li>\n\u003C/ul>\n\u003Cp>Examples use \u003Ccode>build_fragment_mesh\u003C/code> plus \u003Ccode>StandardMaterial\u003C/code> to visualize fragments, but downstream code may instead spawn Avian bodies, pooled debris, custom materials, particles, or audio emitters.\u003C/p>\n\u003Cp>Two optional integration helpers now sit on top of that seam:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>DestructionEffectHooks\u003C/code>\u003Cul>\n\u003Cli>opt-in per-root cue names for \u003Ccode>started\u003C/code>, \u003Ccode>detached\u003C/code>, and \u003Ccode>final\u003C/code> stages\u003C/li>\n\u003Cli>converted by the runtime into \u003Ccode>DestructionEffectTriggered\u003C/code> messages so sound or particle systems do not need to reinterpret structural events themselves\u003C/li>\n\u003C/ul>\n\u003C/li>\n\u003Cli>\u003Ccode>DestructionAvianFragments\u003C/code> (\u003Ccode>avian3d\u003C/code> feature)\u003Cul>\n\u003Cli>opt-in fragment-body adapter that reads \u003Ccode>FragmentSpawnData\u003C/code>\u003C/li>\n\u003Cli>inserts colliders, rigid-body components, mass, damping, friction, restitution, and initial velocities on newly spawned fragments\u003C/li>\n\u003Cli>keeps the core crate backend-neutral because the adapter is compiled only when the feature is enabled\u003C/li>\n\u003C/ul>\n\u003C/li>\n\u003C/ul>\n\u003Cp>When \u003Ccode>max_chunk_spawns_per_frame\u003C/code> is lower than the requested fragment count, activation is queued across subsequent frames. Detachment messages still fire once per detached group, while the remaining fragment spawns drain from the backlog without being lost.\u003C/p>\n\u003Ch2>Cleanup\u003C/h2>\n\u003Cp>Cleanup combines three mechanisms:\u003C/p>\n\u003Col>\n\u003Cli>expiry through \u003Ccode>FragmentLifetime\u003C/code>\u003C/li>\n\u003Cli>distance trimming relative to the nearest viewer\u003C/li>\n\u003Cli>global budget trimming based on \u003Ccode>CleanupPolicy\u003C/code>\u003C/li>\n\u003C/ol>\n\u003Cp>Budget trimming happens on the already-surviving fragments, so consumers can keep debris pressure bounded without relying only on timeouts.\u003C/p>\n\u003Ch2>Diagnostics And Debugging\u003C/h2>\n\u003Cp>The crate publishes:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>DestructionState\u003C/code> on each destructible\u003C/li>\n\u003Cli>\u003Ccode>DestructionDiagnostics\u003C/code> as a global resource\u003C/li>\n\u003Cli>integration messages for start, detach, and final break\u003C/li>\n\u003C/ul>\n\u003Cp>Optional gizmo output is controlled by \u003Ccode>DestructionDebugConfig\u003C/code>. The debug system only runs when Bevy&#39;s gizmo resources exist, so logic-only tests and minimal apps do not need the full render/debug stack.\u003C/p>\n",title:"Architecture",description:"Architecture documentation",rawMarkdown:"## Core Shape\n\n`saddle-physics-destruction` follows the same split that makes NVIDIA Blast useful as a reference:\n\n- authored fracture data is separate from runtime state\n- runtime breakage is separate from physics execution\n- integration happens through messages and fragment descriptors, not hard-wired rigid bodies\n\nThe crate's main data model is:\n\n```text\nFracturedAsset\n  - chunks\n  - bonds\n  - root_chunks\n  - support_chunks\n\nDestructible entity\n  - DestructionAssetHandle\n  - DestructionRuntime (internal)\n  - DestructionState (public)\n```\n\n## Authoring Model\n\nTwo authoring paths ship in v1:\n\n1. `CuboidFractureBuilder`\n   - deterministic jittered-grid volumetric fracture\n   - stable chunk IDs\n   - optional coarse parent groups\n   - anchor presets for top, bottom, or none\n\n2. `ThinSurfaceFractureBuilder`\n   - deterministic 2D Voronoi-style cells extruded into depth\n   - suitable for glass, boards, panels, and thin walls\n   - frame/bottom-edge anchoring presets\n\nBoth builders emit a `FracturedAsset` that the runtime treats identically.\n\nFor gameplay-driven content, a destructible may also carry `RuntimeFracture`. That component stores either builder variant directly on the entity. The plugin turns it into a `DestructionAssetHandle` during activation/update, so runtime-spawned props can fracture without a pre-authored asset handle.\n\n## Runtime Pipeline\n\nThe public system phases are exposed through `DestructionSystems`:\n\n1. `AccumulateDamage`\n2. `EvaluateBonds`\n3. `EvaluateSupport`\n4. `ActivateFragments`\n5. `CleanupDebris`\n\nWithin those phases the default plugin executes:\n\n```text\nensure_runtime_initialized\n  -> process_damage_messages\n  -> evaluate_accumulated_damage\n  -> evaluate_support_graphs\n  -> activate_pending_groups\n  -> update_fragment_lifetimes\n  -> cleanup_fragments\n  -> sync_root_states\n  -> publish_diagnostics\n```\n\n## World Space vs Asset Space\n\nDamage messages are intentionally authored in **world space** because they usually come from gameplay hits, raycasts, explosions, or collision callbacks.\n\nChunk centroids and bond centers inside `FracturedAsset` are stored in **asset-local space**.\n\nThat means the runtime must convert the incoming hit into the destructible's local space before evaluating chunk or bond damage. The crate does this through the entity's `GlobalTransform`:\n\n- hit origin: `world -> local point`\n- hit direction: `world -> local vector`\n\nWithout that conversion, destructibles placed away from the world origin can appear unbreakable even though origin-based tests still pass.\n\n## Support Graph Evaluation\n\nEach support leaf can be anchored in one of two ways:\n\n- authored support on the asset (`SupportKind::Fixed`, `Hanging`, `Weak`)\n- per-entity override via `SupportAnchors`\n\nWhen bonds change, the runtime flood-fills from anchored support leaves to find reachable chunks. Any disconnected support leaves become unsupported islands and are queued for fragment activation.\n\nThis keeps structural integrity cheap:\n\n- no per-frame flood fill when topology is unchanged\n- support recomputation only after bond or chunk detach state changes\n\nIf an asset has no anchors at all, the runtime falls back to a floating-structure rule:\n\n- connected support components are recomputed only when topology changes\n- the largest remaining component stays attached to the root\n- smaller disconnected components detach as fragment groups\n\nThat keeps free-floating crates and props progressive instead of treating \"no anchors\" as \"everything should detach immediately\".\n\n## Hierarchy And LOD\n\nChunks may form a simple parent/child hierarchy:\n\n- support leaves represent fine fracture pieces\n- non-support parents represent coarse activation groups\n\nActivation LOD is driven by `DestructionViewers` and `DistanceLodBand`:\n\n- `Full`: activate fine support leaves\n- `Clustered`: prefer fewer/larger authored groups when possible\n- `EventOnly`: emit detachment messages without spawning fragment entities\n\nThis keeps the core backend-neutral while still supporting near/far authoring behavior.\n\n## Fragment Activation Contract\n\nThe crate spawns entities with:\n\n- `Fragment`\n- `FragmentLifetime`\n- `FragmentSpawnData`\n- inherited transform\n\n`FragmentSpawnData` is the integration seam. It contains:\n\n- render description\n- optional collider source metadata\n- initial linear/angular velocity hints\n- chunk IDs represented by the fragment\n- approximate size and material hint\n\nExamples use `build_fragment_mesh` plus `StandardMaterial` to visualize fragments, but downstream code may instead spawn Avian bodies, pooled debris, custom materials, particles, or audio emitters.\n\nTwo optional integration helpers now sit on top of that seam:\n\n- `DestructionEffectHooks`\n  - opt-in per-root cue names for `started`, `detached`, and `final` stages\n  - converted by the runtime into `DestructionEffectTriggered` messages so sound or particle systems do not need to reinterpret structural events themselves\n- `DestructionAvianFragments` (`avian3d` feature)\n  - opt-in fragment-body adapter that reads `FragmentSpawnData`\n  - inserts colliders, rigid-body components, mass, damping, friction, restitution, and initial velocities on newly spawned fragments\n  - keeps the core crate backend-neutral because the adapter is compiled only when the feature is enabled\n\nWhen `max_chunk_spawns_per_frame` is lower than the requested fragment count, activation is queued across subsequent frames. Detachment messages still fire once per detached group, while the remaining fragment spawns drain from the backlog without being lost.\n\n## Cleanup\n\nCleanup combines three mechanisms:\n\n1. expiry through `FragmentLifetime`\n2. distance trimming relative to the nearest viewer\n3. global budget trimming based on `CleanupPolicy`\n\nBudget trimming happens on the already-surviving fragments, so consumers can keep debris pressure bounded without relying only on timeouts.\n\n## Diagnostics And Debugging\n\nThe crate publishes:\n\n- `DestructionState` on each destructible\n- `DestructionDiagnostics` as a global resource\n- integration messages for start, detach, and final break\n\nOptional gizmo output is controlled by `DestructionDebugConfig`. The debug system only runs when Bevy's gizmo resources exist, so logic-only tests and minimal apps do not need the full render/debug stack.\n",slug:"architecture"},uses:{params:["slug"]}}],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
