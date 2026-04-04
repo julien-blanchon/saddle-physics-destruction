@@ -65,6 +65,34 @@
 
 If no viewers are present, the runtime falls back to near/full behavior and does not distance-trim debris.
 
+## `DestructionEffectHooks`
+
+| Field | Type | Default | Recommended Range | Effect |
+|------|------|---------|-------------------|--------|
+| `start_audio_cue` | `Option<String>` | `None` | Project-specific cue id | Audio cue emitted when the destructible first enters an active damage state |
+| `start_particle_cue` | `Option<String>` | `None` | Project-specific cue id | Particle cue emitted with the same first-damage transition |
+| `detach_audio_cue` | `Option<String>` | `None` | Project-specific cue id | Audio cue emitted when a detached chunk group activates |
+| `detach_particle_cue` | `Option<String>` | `None` | Project-specific cue id | Particle cue emitted when a detached chunk group activates |
+| `final_audio_cue` | `Option<String>` | `None` | Project-specific cue id | Audio cue emitted when the root reaches the fully broken state |
+| `final_particle_cue` | `Option<String>` | `None` | Project-specific cue id | Particle cue emitted when the root reaches the fully broken state |
+
+If a root has this component, the runtime emits `DestructionEffectTriggered` messages that already include the selected audio/particle cue ids plus stage, material, world position, energy, and detached-fragment counts.
+
+## `DestructionAvianFragments` (`avian3d` feature)
+
+| Field | Type | Default | Recommended Range | Effect |
+|------|------|---------|-------------------|--------|
+| `rigid_body` | `RigidBody` | `Dynamic` | Usually `Dynamic` | Rigid-body mode inserted on spawned fragments |
+| `mass_scale` | `f32` | `1.0` | `0.25..2.0` | Scales the authored `mass_hint` before inserting `Mass` |
+| `linear_damping` | `f32` | `0.12` | `0.0..1.0` | Linear damping applied to spawned fragments |
+| `angular_damping` | `f32` | `0.2` | `0.0..1.0` | Angular damping applied to spawned fragments |
+| `gravity_scale` | `f32` | `1.0` | `0.0..2.0` | Per-fragment gravity multiplier |
+| `friction` | `f32` | `0.8` | `0.0..2.0` | Friction coefficient inserted on fragments |
+| `restitution` | `f32` | `0.08` | `0.0..1.0` | Bounce coefficient inserted on fragments |
+| `collision_layers` | `Option<CollisionLayers>` | `None` | Project-specific mask | Optional collision-layer override inserted on fragments |
+
+Attach this component to a destructible root only when the crate is compiled with `features = ["avian3d"]`.
+
 ## `DestructionDebugConfig`
 
 | Field | Type | Default | Recommended Range | Effect |

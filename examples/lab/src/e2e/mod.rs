@@ -1,4 +1,5 @@
 mod budget;
+mod effects;
 mod hierarchy;
 mod lod;
 mod smoke;
@@ -54,6 +55,7 @@ fn parse_e2e_args(args: &[String]) -> (Option<String>, bool) {
 pub fn scenario_by_name(name: &str) -> Option<Scenario> {
     match name {
         "destruction_smoke" => Some(smoke::build()),
+        "destruction_effects" => Some(effects::build()),
         "destruction_supports" => Some(supports::build()),
         "destruction_hierarchy" => Some(hierarchy::build()),
         "destruction_lod" => Some(lod::build()),
@@ -65,6 +67,7 @@ pub fn scenario_by_name(name: &str) -> Option<Scenario> {
 pub fn list_scenarios() -> Vec<&'static str> {
     vec![
         "destruction_smoke",
+        "destruction_effects",
         "destruction_supports",
         "destruction_hierarchy",
         "destruction_lod",

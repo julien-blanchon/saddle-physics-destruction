@@ -1,6 +1,6 @@
 # Saddle Physics Destruction
 
-Backend-agnostic destruction infrastructure for Bevy: pre-fractured assets, bond/support evaluation, progressive damage, hierarchical chunk activation, debris lifecycle policy, and integration messages for physics, audio, and VFX.
+Backend-agnostic destruction infrastructure for Bevy: pre-fractured assets, runtime fracture recipes, bond/support evaluation, progressive damage, hierarchical chunk activation, debris lifecycle policy, and integration messages for physics, audio, and VFX.
 
 ## Design Boundary
 
@@ -22,6 +22,8 @@ Backend-agnostic destruction infrastructure for Bevy: pre-fractured assets, bond
 - game-specific scoring, quest logic, or content authoring tools
 
 The core crate emits backend-neutral fragment data. Downstream code or examples decide how to turn that into meshes, colliders, rigid bodies, audio, or particles.
+
+For projects that do want a ready-made physics bridge, enable the optional `avian3d` feature and attach `DestructionAvianFragments` to a destructible root. The core runtime still stays backend-neutral; the adapter is opt-in.
 
 ## Quick Start
 
@@ -86,7 +88,9 @@ This only drives the destruction runtime. To render fragments, add downstream sy
 | `FracturedAsset` | Authored pre-fractured asset containing chunks, bonds, roots, and support leaves |
 | `ChunkAsset` / `BondAsset` | Stable chunk and bond metadata used by runtime evaluation |
 | `CuboidFractureBuilder` / `ThinSurfaceFractureBuilder` | Deterministic authoring helpers for volumetric and thin-surface fracture assets |
+| `RuntimeFracture` | Entity-side runtime recipe that generates or regenerates a `FracturedAsset` from a cuboid or thin-surface builder |
 | `Destructible` / `DestructionAssetHandle` | Opt-in runtime marker plus authored asset handle |
+| `DestructionEffectHooks` | Optional per-root cue names for downstream sound and particle systems |
 | `DestructionState` | Normalized damage, fracture level, detached chunk count, and broken state |
 | `SupportAnchors` | Optional per-entity override for which support chunks are treated as fixed anchors |
 | `Fragment` / `FragmentLifetime` / `FragmentSpawnData` | Backend-neutral fragment entities plus render/collider/velocity/lifecycle descriptors |
@@ -94,17 +98,22 @@ This only drives the destruction runtime. To render fragments, add downstream sy
 | `DestructionViewers` | Viewer positions used for distance-driven activation LOD and culling |
 | `DestructionDiagnostics` / `DestructionDebugConfig` | Runtime counters and optional debug-gizmo toggles |
 | `ApplyDestructionDamage` | Message-based entrypoint for world-space destruction hits |
-| `DestructionStarted` / `ChunkGroupDetached` / `FinalDestructionOccurred` | Integration messages for audio, VFX, quests, or gameplay reactions |
+| `DestructionStarted` / `ChunkGroupDetached` / `FinalDestructionOccurred` | Structural integration messages for gameplay or content systems |
+| `DestructionEffectTriggered` | Ready-to-consume break cue message emitted from `DestructionEffectHooks` |
+| `DestructionAvianFragments` | Optional `avian3d` adapter component that turns spawned fragments into rigid bodies |
 | `build_fragment_mesh` | Helper for crate examples and simple downstream visual adapters |
 
 ## Supported
 
 - deterministic pre-fractured cuboid assets
 - deterministic thin-surface Voronoi-style fracture assets
+- runtime cuboid and thin-surface fracture generation through `RuntimeFracture`
 - point, radial, directional, and shear-style damage inputs
 - accumulated chunk damage and material-weighted bond breakage
 - support-graph flood fill from authored or overridden anchors
 - progressive breakage with detached group activation
+- optional break cue messages for downstream audio and particle playback
+- optional `avian3d` fragment-body adapter through a feature flag
 - anchorless breakage that keeps the largest connected body intact while smaller components detach
 - near/full, mid/clustered, and far/event-only activation LOD
 - lifetime, distance, and budget-based debris cleanup
@@ -113,7 +122,7 @@ This only drives the destruction runtime. To render fragments, add downstream sy
 
 ## Intentionally Deferred
 
-- runtime mesh slicing or arbitrary runtime Voronoi baking
+- arbitrary runtime mesh slicing for imported meshes
 - built-in rigid-body or collider backend integration
 - skinned-mesh deformation
 - disk caching or serialized family/actor snapshots
@@ -124,10 +133,14 @@ This only drives the destruction runtime. To render fragments, add downstream sy
 | Example | What it demonstrates | Run |
 |---------|----------------------|-----|
 | `basic` | Minimal breakable root plus fragment materialization | `cargo run -p saddle-physics-destruction-example-basic` |
+| `runtime_fracture` | Build cuboid and thin-surface fracture assets at runtime instead of pre-baking handles | `cargo run -p saddle-physics-destruction-example-runtime-fracture` |
 | `structural` | Anchored pillar collapse driven by support evaluation | `cargo run -p saddle-physics-destruction-example-structural` |
 | `hierarchical` | Staged coarse/fine authoring and repeated impact pulses | `cargo run -p saddle-physics-destruction-example-hierarchical` |
 | `thin_surface` | Glass-like sheet fracture using the thin-surface builder | `cargo run -p saddle-physics-destruction-example-thin-surface` |
 | `stress_test` | Repeated hits plus diagnostics-oriented cleanup pressure | `cargo run -p saddle-physics-destruction-example-stress-test` |
+
+The shared example support crate now installs `saddle-pane` for the regular showcase binaries so cleanup, budget, and debug-graph tuning can be adjusted live while fragments are spawning.
+Those same support scenes now also exercise the new effect-hook and Avian adapter paths so the examples land like game props instead of simple debug debris.
 
 ## Crate-Local Lab
 
@@ -141,10 +154,13 @@ Run it directly with:
 cargo run -p saddle-physics-destruction-lab
 ```
 
+The lab now includes its own small `saddle-pane` surface for fragment budgets, effect-hook diagnostics, and runtime counters, so the standalone verification scene stays editable too.
+
 ## E2E Verification
 
 ```bash
 cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_smoke
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_effects
 cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_supports
 cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_hierarchy
 cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_lod

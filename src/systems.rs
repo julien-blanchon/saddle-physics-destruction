@@ -4,13 +4,42 @@ use bevy::prelude::*;
 
 use crate::{
     ApplyDestructionDamage, ChunkGroupDetached, ChunkId, CleanupPolicy, Destructible,
-    DestructionAssetHandle, DestructionConfig, DestructionDiagnostics, DestructionStarted,
-    DestructionState, DestructionViewers, FinalDestructionOccurred, FractureBias, FracturedAsset,
-    Fragment, FragmentLifetime, FragmentSpawnData, InitialVelocity, LodStrategy, MaterialHint,
-    RootVisualMode, SupportAnchors,
-    components::{DestructionRuntime, LastDamageSnapshot, PendingDamage, PendingDetachedGroup},
+    DestructionAssetHandle, DestructionConfig, DestructionDiagnostics, DestructionEffectStage,
+    DestructionEffectTriggered, DestructionStarted, DestructionState, DestructionViewers,
+    FinalDestructionOccurred, FractureBias, FracturedAsset, Fragment, FragmentLifetime,
+    FragmentSpawnData, InitialVelocity, LodStrategy, MaterialHint, RootVisualMode, SupportAnchors,
+    components::{
+        DestructionEffectHooks, DestructionRuntime, LastDamageSnapshot, PendingDamage,
+        PendingDetachedGroup, RuntimeFracture,
+    },
     damage,
 };
+
+pub(crate) fn ensure_runtime_fracture_assets(
+    mut commands: Commands,
+    mut assets: ResMut<Assets<FracturedAsset>>,
+    roots: Query<
+        (Entity, &RuntimeFracture),
+        Or<(Changed<RuntimeFracture>, Without<DestructionAssetHandle>)>,
+    >,
+) {
+    for (entity, runtime_fracture) in &roots {
+        let asset = runtime_fracture.build();
+        if let Err(error) = asset.validate() {
+            warn!(
+                "failed to build runtime fracture asset for entity {:?}: {}",
+                entity, error
+            );
+            continue;
+        }
+
+        let handle = assets.add(asset);
+        commands
+            .entity(entity)
+            .insert((DestructionAssetHandle(handle), DestructionState::default()));
+        commands.entity(entity).remove::<DestructionRuntime>();
+    }
+}
 
 pub(crate) fn ensure_runtime_initialized(
     mut commands: Commands,
@@ -353,6 +382,68 @@ pub(crate) fn activate_pending_groups(
                 material_hint: dominant_material(asset, &asset.support_chunks),
             });
         }
+    }
+}
+
+pub(crate) fn publish_effect_hooks(
+    roots: Query<&DestructionEffectHooks>,
+    mut started_reader: MessageReader<DestructionStarted>,
+    mut detached_reader: MessageReader<ChunkGroupDetached>,
+    mut final_reader: MessageReader<FinalDestructionOccurred>,
+    mut writer: MessageWriter<DestructionEffectTriggered>,
+) {
+    for message in started_reader.read().cloned() {
+        let Ok(hooks) = roots.get(message.source) else {
+            continue;
+        };
+
+        writer.write(DestructionEffectTriggered {
+            source: message.source,
+            stage: DestructionEffectStage::Started,
+            world_position: message.world_position,
+            material_hint: message.material_hint,
+            audio_cue: hooks.start_audio_cue.clone(),
+            particle_cue: hooks.start_particle_cue.clone(),
+            energy: message.energy,
+            fragment_count: 0,
+            detached_chunk_count: 0,
+        });
+    }
+
+    for message in detached_reader.read().cloned() {
+        let Ok(hooks) = roots.get(message.source) else {
+            continue;
+        };
+
+        writer.write(DestructionEffectTriggered {
+            source: message.source,
+            stage: DestructionEffectStage::Detached,
+            world_position: message.world_position,
+            material_hint: message.material_hint,
+            audio_cue: hooks.detach_audio_cue.clone(),
+            particle_cue: hooks.detach_particle_cue.clone(),
+            energy: message.impulse.linear.length(),
+            fragment_count: message.fragment_count,
+            detached_chunk_count: message.chunk_ids.len(),
+        });
+    }
+
+    for message in final_reader.read().cloned() {
+        let Ok(hooks) = roots.get(message.source) else {
+            continue;
+        };
+
+        writer.write(DestructionEffectTriggered {
+            source: message.source,
+            stage: DestructionEffectStage::FinalCollapse,
+            world_position: message.world_position,
+            material_hint: message.material_hint,
+            audio_cue: hooks.final_audio_cue.clone(),
+            particle_cue: hooks.final_particle_cue.clone(),
+            energy: 0.0,
+            fragment_count: message.chunk_count,
+            detached_chunk_count: message.chunk_count,
+        });
     }
 }
 

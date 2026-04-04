@@ -40,6 +40,8 @@ Two authoring paths ship in v1:
 
 Both builders emit a `FracturedAsset` that the runtime treats identically.
 
+For gameplay-driven content, a destructible may also carry `RuntimeFracture`. That component stores either builder variant directly on the entity. The plugin turns it into a `DestructionAssetHandle` during activation/update, so runtime-spawned props can fracture without a pre-authored asset handle.
+
 ## Runtime Pipeline
 
 The public system phases are exposed through `DestructionSystems`:
@@ -132,6 +134,16 @@ The crate spawns entities with:
 - approximate size and material hint
 
 Examples use `build_fragment_mesh` plus `StandardMaterial` to visualize fragments, but downstream code may instead spawn Avian bodies, pooled debris, custom materials, particles, or audio emitters.
+
+Two optional integration helpers now sit on top of that seam:
+
+- `DestructionEffectHooks`
+  - opt-in per-root cue names for `started`, `detached`, and `final` stages
+  - converted by the runtime into `DestructionEffectTriggered` messages so sound or particle systems do not need to reinterpret structural events themselves
+- `DestructionAvianFragments` (`avian3d` feature)
+  - opt-in fragment-body adapter that reads `FragmentSpawnData`
+  - inserts colliders, rigid-body components, mass, damping, friction, restitution, and initial velocities on newly spawned fragments
+  - keeps the core crate backend-neutral because the adapter is compiled only when the feature is enabled
 
 When `max_chunk_spawns_per_frame` is lower than the requested fragment count, activation is queued across subsequent frames. Detachment messages still fire once per detached group, while the remaining fragment spawns drain from the backlog without being lost.
 

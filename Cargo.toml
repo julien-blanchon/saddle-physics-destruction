@@ -7,8 +7,13 @@ repository = "https://github.com/julien-blanchon/saddle-physics-destruction"
 license = "MIT-0"
 description = "Backend-agnostic destruction toolkit for breakable Bevy structures and pre-fractured assets"
 
+[features]
+default = []
+avian3d = ["dep:avian3d"]
+
 [dependencies]
 bevy = { version = "0.18", features = ["serialize"] }
+avian3d = { version = "0.6", features = ["serialize"], optional = true }
 
 [workspace]
 

@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     ChunkId, ColliderSource, FractureBias, FracturedAsset, FragmentRenderData, MaterialHint,
+    authoring::{CuboidFractureBuilder, ThinSurfaceFractureBuilder},
     damage::DamageProfile,
 };
 
@@ -30,6 +31,41 @@ impl Default for Destructible {
 #[derive(Component, Debug, Clone, Reflect)]
 #[reflect(Component)]
 pub struct DestructionAssetHandle(pub Handle<FracturedAsset>);
+
+#[derive(Component, Debug, Clone, Default, Reflect)]
+#[reflect(Component)]
+pub struct DestructionEffectHooks {
+    pub start_audio_cue: Option<String>,
+    pub start_particle_cue: Option<String>,
+    pub detach_audio_cue: Option<String>,
+    pub detach_particle_cue: Option<String>,
+    pub final_audio_cue: Option<String>,
+    pub final_particle_cue: Option<String>,
+}
+
+#[derive(Component, Debug, Clone, Reflect)]
+#[reflect(Component)]
+pub enum RuntimeFracture {
+    Cuboid(CuboidFractureBuilder),
+    ThinSurface(ThinSurfaceFractureBuilder),
+}
+
+impl RuntimeFracture {
+    pub fn cuboid(builder: CuboidFractureBuilder) -> Self {
+        Self::Cuboid(builder)
+    }
+
+    pub fn thin_surface(builder: ThinSurfaceFractureBuilder) -> Self {
+        Self::ThinSurface(builder)
+    }
+
+    pub fn build(&self) -> FracturedAsset {
+        match self {
+            Self::Cuboid(builder) => builder.build(),
+            Self::ThinSurface(builder) => builder.build(),
+        }
+    }
+}
 
 #[derive(Component, Debug, Clone, Default, Reflect)]
 #[reflect(Component)]

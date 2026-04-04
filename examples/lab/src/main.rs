@@ -2,13 +2,17 @@
 mod e2e;
 
 use bevy::prelude::*;
+use bevy_flair::FlairPlugin;
+use bevy_input_focus::{InputDispatchPlugin, tab_navigation::TabNavigationPlugin};
+use bevy_ui_widgets::UiWidgetsPlugins;
+use saddle_pane::prelude::*;
 use saddle_physics_destruction::{
     ChunkGroupDetached, CuboidAnchorPreset, CuboidFractureBuilder, Destructible,
-    DestructionAssetHandle, DestructionConfig, DestructionDiagnostics, DestructionPlugin,
-    DestructionState, DestructionSystems, DestructionViewers, FinalDestructionOccurred,
-    FracturedAsset, Fragment, FragmentLifetime, FragmentRenderData, FragmentSpawnData,
-    MaterialHint, RootVisualMode, ThinSurfaceAnchorPreset, ThinSurfaceFractureBuilder,
-    build_fragment_mesh,
+    DestructionAssetHandle, DestructionConfig, DestructionDiagnostics, DestructionEffectHooks,
+    DestructionEffectStage, DestructionEffectTriggered, DestructionPlugin, DestructionState,
+    DestructionSystems, DestructionViewers, FinalDestructionOccurred, FracturedAsset, Fragment,
+    FragmentLifetime, FragmentRenderData, FragmentSpawnData, MaterialHint, RootVisualMode,
+    ThinSurfaceAnchorPreset, ThinSurfaceFractureBuilder, build_fragment_mesh,
 };
 
 #[cfg(all(feature = "dev", not(target_arch = "wasm32")))]
@@ -49,7 +53,59 @@ pub struct LabMetrics {
     pub far_detaches: u32,
     pub budget_detaches: u32,
     pub final_destructions: u32,
+    pub effect_triggers: u32,
+    pub last_effect_stage: String,
+    pub last_audio_cue: String,
+    pub last_particle_cue: String,
     pub peak_active_fragments: usize,
+}
+
+#[derive(Resource, Pane)]
+#[pane(title = "Destruction Lab", position = "top-right")]
+struct LabPane {
+    #[pane(slider, min = 16.0, max = 256.0, step = 1.0)]
+    fragment_budget: usize,
+    #[pane(slider, min = 1.0, max = 12.0, step = 0.1)]
+    fragment_lifetime_secs: f32,
+    #[pane(slider, min = 0.0, max = 2.0, step = 0.05)]
+    fragment_fade_secs: f32,
+    #[pane(slider, min = 8.0, max = 96.0, step = 1.0)]
+    max_chunk_spawns_per_frame: usize,
+}
+
+impl FromWorld for LabPane {
+    fn from_world(world: &mut World) -> Self {
+        let config = world.resource::<DestructionConfig>().clone();
+        Self {
+            fragment_budget: config.fragment_budget,
+            fragment_lifetime_secs: config.default_fragment_lifetime_secs,
+            fragment_fade_secs: config.fragment_fade_secs,
+            max_chunk_spawns_per_frame: config.max_chunk_spawns_per_frame,
+        }
+    }
+}
+
+#[derive(Resource, Default, Pane)]
+#[pane(title = "Lab Stats", position = "bottom-right")]
+struct LabStatsPane {
+    #[pane(monitor)]
+    active_fragments: usize,
+    #[pane(monitor)]
+    peak_active_fragments: usize,
+    #[pane(monitor)]
+    smoke_detaches: u32,
+    #[pane(monitor)]
+    support_detaches: u32,
+    #[pane(monitor)]
+    final_destructions: u32,
+    #[pane(monitor)]
+    effect_triggers: u32,
+    #[pane(monitor)]
+    last_effect_stage: String,
+    #[pane(monitor)]
+    last_audio_cue: String,
+    #[pane(monitor)]
+    last_particle_cue: String,
 }
 
 fn main() {
@@ -62,6 +118,13 @@ fn main() {
         }),
         ..default()
     }))
+    .add_plugins((
+        FlairPlugin,
+        InputDispatchPlugin,
+        UiWidgetsPlugins,
+        TabNavigationPlugin,
+        PanePlugin,
+    ))
     .insert_resource(ClearColor(Color::srgb(0.06, 0.065, 0.08)))
     .insert_resource(DestructionConfig {
         fragment_budget: 96,
@@ -90,7 +153,9 @@ fn main() {
     .init_resource::<LabMetrics>()
     .register_type::<LabEntities>()
     .register_type::<LabMetrics>()
-    .add_plugins(DestructionPlugin::default());
+    .add_plugins(DestructionPlugin::default())
+    .register_pane::<LabPane>()
+    .register_pane::<LabStatsPane>();
 
     #[cfg(all(feature = "dev", not(target_arch = "wasm32")))]
     app.add_plugins(BrpExtrasPlugin::default());
@@ -106,6 +171,8 @@ fn main() {
         .add_systems(
             Update,
             (
+                sync_pane_to_config,
+                sync_stats_pane,
                 materialize_fragments,
                 animate_fragments,
                 fade_fragment_materials,
@@ -115,7 +182,11 @@ fn main() {
         )
         .add_systems(
             Update,
-            (track_detach_messages, track_final_destruction_messages)
+            (
+                track_detach_messages,
+                track_final_destruction_messages,
+                track_effect_messages,
+            )
                 .after(DestructionSystems::ActivateFragments),
         );
 
@@ -349,6 +420,14 @@ fn spawn_root(
             Name::new(name.to_string()),
             Destructible { visual_mode },
             DestructionAssetHandle(handle),
+            DestructionEffectHooks {
+                start_audio_cue: Some("destruction.start".into()),
+                start_particle_cue: Some("dust_ring".into()),
+                detach_audio_cue: Some("destruction.detach".into()),
+                detach_particle_cue: Some("debris_burst".into()),
+                final_audio_cue: Some("destruction.final".into()),
+                final_particle_cue: Some("collapse_flash".into()),
+            },
             Mesh3d(meshes.add(build_fragment_mesh(&preview_render))),
             MeshMaterial3d(materials.add(material_for_hint(material_hint, 1.0))),
             transform,
@@ -446,6 +525,21 @@ fn track_final_destruction_messages(
     metrics.final_destructions += reader.read().count() as u32;
 }
 
+fn track_effect_messages(
+    mut metrics: ResMut<LabMetrics>,
+    mut reader: MessageReader<DestructionEffectTriggered>,
+) {
+    for message in reader.read() {
+        metrics.effect_triggers += 1;
+        metrics.last_effect_stage = effect_stage_label(message.stage).to_string();
+        metrics.last_audio_cue = message.audio_cue.clone().unwrap_or_else(|| "-".into());
+        metrics.last_particle_cue = message
+            .particle_cue
+            .clone()
+            .unwrap_or_else(|| "-".into());
+    }
+}
+
 fn update_peak_fragments(
     diagnostics: Res<DestructionDiagnostics>,
     mut metrics: ResMut<LabMetrics>,
@@ -475,6 +569,13 @@ fn update_overlay(
             metrics.budget_detaches
         ),
         format!("final destructions: {}", metrics.final_destructions),
+        format!(
+            "effect hooks: {} [{} | {} | {}]",
+            metrics.effect_triggers,
+            metrics.last_effect_stage,
+            metrics.last_audio_cue,
+            metrics.last_particle_cue
+        ),
         format!("budget target count: {}", entities.budget_targets.len()),
     ];
 
@@ -489,6 +590,33 @@ fn update_overlay(
     }
 
     text.0 = lines.join("\n");
+}
+
+fn sync_pane_to_config(pane: Res<LabPane>, mut config: ResMut<DestructionConfig>) {
+    if !pane.is_changed() && !pane.is_added() {
+        return;
+    }
+
+    config.fragment_budget = pane.fragment_budget;
+    config.default_fragment_lifetime_secs = pane.fragment_lifetime_secs;
+    config.fragment_fade_secs = pane.fragment_fade_secs;
+    config.max_chunk_spawns_per_frame = pane.max_chunk_spawns_per_frame;
+}
+
+fn sync_stats_pane(
+    diagnostics: Res<DestructionDiagnostics>,
+    metrics: Res<LabMetrics>,
+    mut pane: ResMut<LabStatsPane>,
+) {
+    pane.active_fragments = diagnostics.active_fragments;
+    pane.peak_active_fragments = metrics.peak_active_fragments;
+    pane.smoke_detaches = metrics.smoke_detaches;
+    pane.support_detaches = metrics.support_detaches;
+    pane.final_destructions = metrics.final_destructions;
+    pane.effect_triggers = metrics.effect_triggers;
+    pane.last_effect_stage = metrics.last_effect_stage.clone();
+    pane.last_audio_cue = metrics.last_audio_cue.clone();
+    pane.last_particle_cue = metrics.last_particle_cue.clone();
 }
 
 fn material_for_hint(material_hint: MaterialHint, alpha: f32) -> StandardMaterial {
@@ -569,4 +697,12 @@ pub(crate) fn leaf_fragment_count_for_source(world: &mut World, source: Entity) 
         .iter(world)
         .filter(|fragment| fragment.source == source && fragment.chunk_count == 1)
         .count()
+}
+
+fn effect_stage_label(stage: DestructionEffectStage) -> &'static str {
+    match stage {
+        DestructionEffectStage::Started => "Started",
+        DestructionEffectStage::Detached => "Detached",
+        DestructionEffectStage::FinalCollapse => "FinalCollapse",
+    }
 }

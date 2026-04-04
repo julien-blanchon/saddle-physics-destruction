@@ -96,3 +96,24 @@ pub struct FinalDestructionOccurred {
     pub chunk_count: usize,
     pub material_hint: MaterialHint,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Default)]
+pub enum DestructionEffectStage {
+    #[default]
+    Started,
+    Detached,
+    FinalCollapse,
+}
+
+#[derive(Message, Debug, Clone, Reflect)]
+pub struct DestructionEffectTriggered {
+    pub source: Entity,
+    pub stage: DestructionEffectStage,
+    pub world_position: Vec3,
+    pub material_hint: MaterialHint,
+    pub audio_cue: Option<String>,
+    pub particle_cue: Option<String>,
+    pub energy: f32,
+    pub fragment_count: usize,
+    pub detached_chunk_count: usize,
+}

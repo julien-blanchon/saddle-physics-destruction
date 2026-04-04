@@ -11,17 +11,18 @@ Crate-local showcase and verification app for `destruction`.
 ## How To Run
 
 ```bash
-cargo run -p destruction_lab
+cargo run -p saddle-physics-destruction-lab
 ```
 
 ## E2E Scenarios
 
 ```bash
-cargo run -p destruction_lab --features e2e -- destruction_smoke
-cargo run -p destruction_lab --features e2e -- destruction_supports
-cargo run -p destruction_lab --features e2e -- destruction_hierarchy
-cargo run -p destruction_lab --features e2e -- destruction_lod
-cargo run -p destruction_lab --features e2e -- destruction_budget
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_smoke
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_effects
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_supports
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_hierarchy
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_lod
+cargo run -p saddle-physics-destruction-lab --features e2e -- destruction_budget
 ```
 
 ## BRP

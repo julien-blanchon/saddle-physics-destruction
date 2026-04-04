@@ -6,6 +6,8 @@ use bevy::prelude::*;
 
 mod asset;
 mod authoring;
+#[cfg(feature = "avian3d")]
+mod avian;
 mod components;
 mod config;
 mod damage;
@@ -23,9 +25,12 @@ pub use asset::{
 pub use authoring::{
     CuboidAnchorPreset, CuboidFractureBuilder, ThinSurfaceAnchorPreset, ThinSurfaceFractureBuilder,
 };
+#[cfg(feature = "avian3d")]
+pub use avian::DestructionAvianFragments;
 pub use components::{
-    Destructible, DestructionAssetHandle, DestructionState, Fragment, FragmentLifetime,
-    FragmentSpawnData, InitialVelocity, RootVisualMode, SupportAnchors,
+    Destructible, DestructionAssetHandle, DestructionEffectHooks, DestructionState, Fragment,
+    FragmentLifetime, FragmentSpawnData, InitialVelocity, RootVisualMode, RuntimeFracture,
+    SupportAnchors,
 };
 pub use config::{
     CleanupPolicy, DestructionConfig, DestructionDebugConfig, DestructionDiagnostics,
@@ -33,8 +38,9 @@ pub use config::{
 };
 pub use ids::{BondId, ChunkId};
 pub use messages::{
-    ApplyDestructionDamage, ChunkGroupDetached, DamageKind, DestructionStarted, FalloffCurve,
-    FinalDestructionOccurred, FractureBias,
+    ApplyDestructionDamage, ChunkGroupDetached, DamageKind, DestructionEffectStage,
+    DestructionEffectTriggered, DestructionStarted, FalloffCurve, FinalDestructionOccurred,
+    FractureBias,
 };
 pub use render::build_fragment_mesh;
 
@@ -95,6 +101,7 @@ impl Plugin for DestructionPlugin {
             .add_message::<ApplyDestructionDamage>()
             .add_message::<DestructionStarted>()
             .add_message::<ChunkGroupDetached>()
+            .add_message::<DestructionEffectTriggered>()
             .add_message::<FinalDestructionOccurred>()
             .register_type::<ApplyDestructionDamage>()
             .register_type::<BondAsset>()
@@ -107,6 +114,9 @@ impl Plugin for DestructionPlugin {
             .register_type::<ColliderSource>()
             .register_type::<Destructible>()
             .register_type::<DestructionAssetHandle>()
+            .register_type::<DestructionEffectHooks>()
+            .register_type::<DestructionEffectStage>()
+            .register_type::<DestructionEffectTriggered>()
             .register_type::<DestructionConfig>()
             .register_type::<DestructionDebugConfig>()
             .register_type::<DestructionDiagnostics>()
@@ -128,57 +138,84 @@ impl Plugin for DestructionPlugin {
             .register_type::<LodStrategy>()
             .register_type::<MaterialHint>()
             .register_type::<RootVisualMode>()
+            .register_type::<RuntimeFracture>()
             .register_type::<SupportAnchors>()
-            .register_type::<SupportKind>()
-            .configure_sets(
-                self.update_schedule,
-                (
-                    DestructionSystems::AccumulateDamage,
-                    DestructionSystems::EvaluateBonds,
-                    DestructionSystems::EvaluateSupport,
-                    DestructionSystems::ActivateFragments,
-                    DestructionSystems::CleanupDebris,
-                )
-                    .chain(),
+            .register_type::<SupportKind>();
+
+        #[cfg(feature = "avian3d")]
+        app.register_type::<DestructionAvianFragments>();
+
+        app.configure_sets(
+            self.update_schedule,
+            (
+                DestructionSystems::AccumulateDamage,
+                DestructionSystems::EvaluateBonds,
+                DestructionSystems::EvaluateSupport,
+                DestructionSystems::ActivateFragments,
+                DestructionSystems::CleanupDebris,
             )
-            .add_systems(self.activate_schedule, systems::ensure_runtime_initialized)
-            .add_systems(
-                self.update_schedule,
-                systems::ensure_runtime_initialized.before(DestructionSystems::AccumulateDamage),
+                .chain(),
+        )
+        .add_systems(
+            self.activate_schedule,
+            (
+                systems::ensure_runtime_fracture_assets,
+                systems::ensure_runtime_initialized,
             )
-            .add_systems(
-                self.update_schedule,
-                systems::process_damage_messages.in_set(DestructionSystems::AccumulateDamage),
+                .chain(),
+        )
+        .add_systems(
+            self.update_schedule,
+            (
+                systems::ensure_runtime_fracture_assets,
+                systems::ensure_runtime_initialized,
             )
-            .add_systems(
-                self.update_schedule,
-                systems::evaluate_accumulated_damage.in_set(DestructionSystems::EvaluateBonds),
+                .chain()
+                .before(DestructionSystems::AccumulateDamage),
+        )
+        .add_systems(
+            self.update_schedule,
+            systems::process_damage_messages.in_set(DestructionSystems::AccumulateDamage),
+        )
+        .add_systems(
+            self.update_schedule,
+            systems::evaluate_accumulated_damage.in_set(DestructionSystems::EvaluateBonds),
+        )
+        .add_systems(
+            self.update_schedule,
+            systems::evaluate_support_graphs.in_set(DestructionSystems::EvaluateSupport),
+        )
+        .add_systems(
+            self.update_schedule,
+            systems::activate_pending_groups.in_set(DestructionSystems::ActivateFragments),
+        )
+        .add_systems(
+            self.update_schedule,
+            systems::publish_effect_hooks.after(DestructionSystems::ActivateFragments),
+        )
+        .add_systems(
+            self.update_schedule,
+            (
+                systems::update_fragment_lifetimes,
+                systems::cleanup_fragments,
+                systems::sync_root_states,
+                systems::publish_diagnostics,
             )
-            .add_systems(
-                self.update_schedule,
-                systems::evaluate_support_graphs.in_set(DestructionSystems::EvaluateSupport),
-            )
-            .add_systems(
-                self.update_schedule,
-                systems::activate_pending_groups.in_set(DestructionSystems::ActivateFragments),
-            )
-            .add_systems(
-                self.update_schedule,
-                (
-                    systems::update_fragment_lifetimes,
-                    systems::cleanup_fragments,
-                    systems::sync_root_states,
-                    systems::publish_diagnostics,
-                )
-                    .chain()
-                    .in_set(DestructionSystems::CleanupDebris),
-            )
-            .add_systems(
-                self.update_schedule,
-                debug::draw_debug_gizmos
-                    .after(DestructionSystems::CleanupDebris)
-                    .run_if(resource_exists::<GizmoConfigStore>),
-            );
+                .chain()
+                .in_set(DestructionSystems::CleanupDebris),
+        )
+        .add_systems(
+            self.update_schedule,
+            debug::draw_debug_gizmos
+                .after(DestructionSystems::CleanupDebris)
+                .run_if(resource_exists::<GizmoConfigStore>),
+        );
+
+        #[cfg(feature = "avian3d")]
+        app.add_systems(
+            self.update_schedule,
+            avian::attach_avian_fragment_bodies.after(DestructionSystems::ActivateFragments),
+        );
     }
 }
 
